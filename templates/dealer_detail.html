@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 CSS -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <title>{{ 'Dealer Details' if dealer else 'Add New Dealer' }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            position: relative;
+            background-blend-mode: overlay;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.1);
+            z-index: -2;
+        }
+
+        .center-container {
+            width: 70%;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.90);
+        }
+
+        h2 {
+            color: #2c5e1a;
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 12px 8px;
+            vertical-align: top;
+        }
+
+        td:first-child {
+            width: 35%;
+            font-weight: 500;
+            color: #2c5e1a;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        input[type="submit"],
+        button {
+            padding: 10px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+        }
+
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #3e8e41;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        #saleForm {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9fff9;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .center-container {
+                width: 90%;
+            }
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* Updated Product Box Styles */
+        .products-box {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+        }
+
+        .product-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+            position: relative;
+            padding-right: 30px;
+        }
+
+        .product-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-group {
+            flex: 1;
+        }
+
+        .field-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .field-group select,
+        .field-group input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+       .remove-product {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background-color: transparent;
+    color: #060606;
+    border: 1px solid #090808;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    line-height: 16px; /* Centers the × vertically */
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.remove-product:hover {
+    background-color: #f44336;
+    color: white;
+}
+
+        .add-product-btn {
+            background-color: #2196F3;
+        }
+
+        .add-product-btn:hover {
+            background-color: #0b7dda;
+        }
+
+        .form-actions {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+      #saleForm {
+    /* Remove fullscreen styles if they exist */
+    position: static;
+    width: auto;
+    max-width: 100%;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f9fff9;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.products-box {
+    /* Allow natural expansion */
+    min-height: 200px; /* Minimum height before expanding */
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+.product-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.field-group {
+    flex: 1;
+}
+
+.field-group:first-child {
+    flex: 2; /* Give more space to product name */
+}
+
+/* Keep existing table styles for other form elements */
+#saleForm table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Adjust Sale To field */
+#saleForm table tr:first-child td:first-child {
+    width: 20% !important;  /* Reduce label width */
+    padding-right: 5px;     /* Reduce spacing between label and field */
+}
+
+#saleForm table tr:first-child td:last-child {
+    width: 80% !important;
+}
+
+/* Make Date field more compact */
+#saleForm table tr:nth-child(2) td:first-child {
+    width: 20% !important;
+    padding-right: 5px;
+}
+
+#saleForm table tr:nth-child(2) td:last-child {
+    width: 30% !important;  /* Make date field narrower */
+}
+
+/* Adjust Select2 dropdown width */
+.select2-container {
+    width: 90% !important;
+    min-width: 150px !important;  /* Prevent from becoming too narrow */
+}
+
+.center-container form[action="/dealers/save"] table td {
+    padding: 4px 6px !important; /* Reduced vertical padding */
+}
+
+.center-container form[action="/dealers/save"] table tr {
+    height: 30px; /* Reduced from default */
+    margin-bottom: 5px; /* Space between rows */
+}
+
+.center-container form[action="/dealers/save"] table td:first-child {
+    width: 30% !important; /* Narrower label column */
+    padding-right: 5px !important; /* Less space after label */
+}
+
+.center-container form[action="/dealers/save"] input[type="text"],
+.center-container form[action="/dealers/save"] input[type="number"],
+.center-container form[action="/dealers/save"] select {
+    height: 30px; /* Smaller height */
+    padding: 5px 8px; /* Reduced padding */
+    font-size: 0.9em; /* Slightly smaller text */
+}
+
+/* Make date input field smaller */
+#date_str {
+    width: 150px !important;  /* Fixed width for date field */
+    padding: 8px !important;  /* Reduce padding */
+}
+
+/* Alternating row colors for dealer details */
+form[action="/dealers/save"] table tr:nth-child(even) {
+    background-color: #dcf3dc;  /* Light green tint */
+}
+
+form[action="/dealers/save"] table tr:nth-child(odd) {
+    background-color: #f6f9e1;  /* Pure white */
+}
+
+/* Add some padding and borders for better separation */
+form[action="/dealers/save"] table tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+form[action="/dealers/save"] table tr:hover {
+    background-color: #e8f5e9;  /* Slightly darker green on hover */
+}
+
+/* Keep the text colors consistent */
+form[action="/dealers/save"] table tr td {
+    color: #333;  /* Dark gray text */
+}
+
+form[action="/dealers/save"] table tr td:first-child {
+    color: #2c5e1a;  /* Your existing green for labels */
+}
+
+.back-icon {
+    position: absolute;
+    right: 450px;
+    top: 2.7%;
+    color: #2c5e1a;
+    font-size: 1.5rem;
+    transition: transform 0.2s;
+}
+.back-icon:hover {
+    transform: scale(1.2);
+    color: #1e3e12;
+}
+    </style>
+</head>
+<body>
+
+<div class="center-container">
+    <div class="header-row">
+        <h2>{{ 'Dealer Details' if dealer else 'Add New Dealer' }}</h2>
+        {% if dealer %}
+        <button type="button" onclick="toggleSaleForm()">Sale</button>
+        {% endif %}
+    </div>
+
+    {% if dealer %}
+    <!-- Sale Form shown right below the button -->
+    <div id="saleForm">
+        <form method="post" action="/dealers/{{ dealer.dealer_id }}/buy" id="multiProductForm">
+             <table>
+                <tr>
+                    <td><label for="sale_to">Sale To:</label></td>
+                    <td>
+                       <select name="sale_to" id="sale_to" class="select2" required>
+                            <option value="">-- Select Receiver --</option>
+                            {% for d in other_dealers %}
+                                    <option value="{{ d.NAME_OF_THE_FIRM }}">{{ d.NAME_OF_THE_FIRM }}</option>
+                            {% endfor %}
+                            <option value="Farmer">Farmer</option>
+                        </select>
+                        <button type="button" 
+                        onclick="window.location.href='/dealers/{{ dealer.dealer_id }}'" 
+                        style="position: absolute; right: 375px; top: 17%; transform: translateY(-50%);
+                               background-color: #98ff98; color: #2c5e1a; 
+                               padding: 4px 8px; border: 1px solid #2c5e1a; 
+                               border-radius: 4px; cursor: pointer;">
+                        Back
+                    </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="date_str">Date:</label></td>
+                    <td><input type="date" name="date_str" id="date_str" value="{{ current_date }}" required></td>
+                </tr>
+            </table>
+            
+            <h3>Products to Transfer</h3>
+            <div class="products-box">
+                <div id="productsContainer">
+                    <div class="product-row" id="productRow_0">
+                        <div class="field-group">
+                            <label>Product Name:</label>
+                            <select name="products[0][product_id]" class="select2 product-select" required>
+                                <option value="">-- Select Product --</option>
+                                {% for dp in dealer_products %}
+                                <option value="{{ dp.id }}" data-available="{{ dp.quantity }}">
+                                    {{ dp.product.Product }} (Available: {{ dp.quantity }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label>Quantity:</label>
+                            <input type="number" name="products[0][quantity]" min="1" required>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="add-product-btn" onclick="addProductRow()">Add Another Product</button>
+                <input type="submit" value="Submit All Products">
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Main dealer form -->
+    <form method="post" action="/dealers/save">
+         <a href="/dealers/" class="back-icon text-decoration-none">
+            <i class="bi bi-arrow-left-circle-fill"></i>
+        </a>
+        <table>
+            {% if dealer %}
+                {% for field, label in [
+                    ('NAME_OF_THE_FIRM', 'Name of Firm'),
+                    ('NAME_OF_THE_PROPRIETOR', 'Name of Proprietor'),
+                    ('City_Town_Village', 'City or Village or Town'),
+                    ('Floor_No', 'Floor No'),
+                    ('District', 'District'),
+                    ('State', 'State'),
+                    ('PIN_Code', 'Pin No'),
+                    ('ADDRESS', 'Address'),
+                    ('DIVISION', 'Division'),
+                    ('CONTACT_NO', 'Contact No'),
+                    ('FIRM_TYPE', 'Firm Type'),
+                    ('GST_NO', 'GST No'),
+                    ('PESTISIDE_LICENSE', 'Pestiside License'),
+                    ('SEEDS_LICENSE', 'Seed License'),
+                    ('FERTILIZERS_LICENSE', 'Fertilizer License'),
+                    ('BANK_NAME', 'Bank Name'),
+                    ('BANK_ACCOUNT_NO', 'Bank Account No'),
+                    ('IFSC_CODE', 'IFSC Code'),
+                    ('CHEQUE_NO', 'Cheque No'),
+                    ('PAN_CARD_NO', 'Pan No'),
+                    ('AADHAR_CARD_NO', 'Aadhar No'),
+                    ('EMAIL', 'Email'),
+                    ('Dates', 'Dates')
+                ] %}
+                <tr>
+                    <td><label>{{ label }}:</label></td>
+                        <td style="display: flex; align-items: center; gap: 10px;">
+                            {% if field == 'State' %}
+                                <select name="State" id="state-select" class="editable" disabled style="width: 100%">
+                                        {% for state in ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+                                            'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+                                            'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+                                            'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+                                            'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
+                                            'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir',
+                                            'Ladakh', 'Lakshadweep', 'Puducherry'] %}
+                                    <option value="{{ state }}" {% if dealer[field] == state %}selected{% endif %}>{{ state }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% elif field == 'CONTACT_NO' %}
+                                <input type="text" name="CONTACT_NO" class="editable" value="{{ dealer[field] }}" readonly>
+                            {% elif field == 'District' %}
+                                <input type="text" name="District" class="editable" value="{{ dealer[field] }}" readonly>
+                            {% else %}
+                                <input type="text" name="{{ field }}" value="{{ dealer[field] }}" readonly>
+                            {% endif %}
+        
+                            {% if field in ['State', 'CONTACT_NO', 'District'] %}
+                                    <button type="button" onclick="enableEdit(this)"
+                                        style="padding: 4px 2px; background-color: #f7fcf8; border: none; border-radius: 5px; cursor: pointer; margin-left: 2px;">
+                                        <i class="bi bi-pencil" style="font-size: 11px; color: rgb(7, 6, 6);"></i>
+                                    </button>
+
+                        {% endif %}
+                    </td>
+                </tr>
+
+                
+                    
+             {% endfor %}
+             <input type="hidden" name="dealer_id" value="{{ dealer['dealer_id'] }}">
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <input type="submit" value="Update Dealer">
+                    </td>
+                </tr>
+
+                
+            {% else %}
+                {% set required_fields = ['NAME_OF_THE_FIRM', 'NAME_OF_THE_PROPRIETOR', 'GST_NO'] %}
+                {% for name, label in [
+                    ('NAME_OF_THE_FIRM', 'Name of Firm'),
+                    ('NAME_OF_THE_PROPRIETOR', 'Name of Proprietor'),
+                    ('City_Town_Village', 'City or Village or Town'),
+                    ('Floor_No', 'Floor No'),
+                    ('District', 'District'),
+                    ('State', 'State'),
+                    ('PIN_Code', 'Pin No'),
+                    ('ADDRESS', 'Address'),
+                    ('DIVISION', 'Division'),
+                    ('CONTACT_NO', 'Contact No'),
+                    ('FIRM_TYPE', 'Firm Type'),
+                    ('GST_NO', 'GST No'),
+                    ('PESTISIDE_LICENSE', 'Pestiside License'),
+                    ('SEEDS_LICENSE', 'Seed License'),
+                    ('FERTILIZERS_LICENSE', 'Fertilizer License'),
+                    ('BANK_NAME', 'Bank Name'),
+                    ('BANK_ACCOUNT_NO', 'Bank Account No'),
+                    ('IFSC_CODE', 'IFSC Code'),
+                    ('CHEQUE_NO', 'Cheque No'),
+                    ('PAN_CARD_NO', 'Pan No'),
+                    ('AADHAR_CARD_NO', 'Aadhar No'),
+                    ('EMAIL', 'Email'),
+                    ('Dates', 'Dates')
+                ] %}
+                 <tr>
+                    <td><label for="{{ name }}">{{ label }}:</label></td>
+                    <td>
+                         {% if name == 'Dates' %}
+                        <!-- Date picker for Dates field -->
+                            <input type="date" name="{{ name }}" id="{{ name }}" value="{{ current_date }}" required>
+                        {% else %}
+                        <!-- Regular text input for other fields -->
+                            <input type="text" name="{{ name }}" id="{{ name }}" value="{{ dealer[name] if dealer else '' }}" {% if name in ['NAME_OF_THE_FIRM', 'CONTACT_NO'] %}required{% endif %}>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+                {% endfor %}
+                
+            {% endif %}
+        </table>
+
+        {% if not dealer %}
+        <div class="form-footer">
+            <input type="submit" value="Save">
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    let productRowCount = 1;
+    
+    function toggleSaleForm() {
+        const form = document.getElementById('saleForm');
+        const dealerForm = document.querySelector('form[action="/dealers/save"]');
+        
+        if (form.style.display === 'none' || form.style.display === '') {
+            // Show sale form, hide dealer details
+            form.style.display = 'block';
+            dealerForm.style.display = 'none';
+        } else {
+            // Show dealer details, hide sale form
+            form.style.display = 'none';
+            dealerForm.style.display = 'block';
+        }
+    }
+
+    // Initialize with dealer details visible and sale form hidden
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('saleForm').style.display = 'none';
+        
+        $('.select2').select2({
+            width: '100%',
+            placeholder: "Select an option",
+            allowClear: true
+        });
+        
+        $('.product-select').on('change', function() {
+            validateQuantity(this);
+        });
+    });
+
+    function addProductRow() {
+        const container = document.getElementById('productsContainer');
+        const newRow = document.createElement('div');
+        newRow.className = 'product-row';
+        newRow.id = `productRow_${productRowCount}`;
+        
+        newRow.innerHTML = `
+            <div class="field-group">
+                <label>Product Name:</label>
+                <select name="products[${productRowCount}][product_id]" class="select2 product-select" required>
+                    <option value="">-- Select Product --</option>
+                    {% for dp in dealer_products %}
+                    <option value="{{ dp.id }}" data-available="{{ dp.quantity }}">
+                        {{ dp.product.Product }} (Available: {{ dp.quantity }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Quantity:</label>
+                <input type="number" name="products[${productRowCount}][quantity]" min="1" required>
+            </div>
+            <button type="button" class="remove-product" onclick="removeProductRow(${productRowCount})">X</button>
+        `;
+        
+        container.appendChild(newRow);
+        $(newRow).find('.select2').select2();
+        productRowCount++;
+    }
+
+    function removeProductRow(rowId) {
+        const rowToRemove = document.getElementById(`productRow_${rowId}`);
+        if (rowToRemove) rowToRemove.remove();
+    }
+
+    function validateQuantity(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const availableQuantity = selectedOption ? parseInt(selectedOption.getAttribute('data-available')) : 0;
+        const quantityInput = selectElement.closest('.product-row').querySelector('input[type="number"]');
+        
+        if (quantityInput) {
+            quantityInput.max = availableQuantity;
+            if (parseInt(quantityInput.value) > availableQuantity) {
+                quantityInput.value = availableQuantity;
+                alert(`Maximum available: ${availableQuantity}`);
+            }
+        }
+    }
+    
+     function enableEdit(button) {
+        const td = button.closest('td');
+        const input = td.querySelector('.editable');
+
+        if (input.tagName === "SELECT") {
+            input.disabled = false;
+        } else {
+            input.readOnly = false;
+        }
+
+        input.focus();
+    }
+</script>
