@@ -19,9 +19,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Import routers BEFORE routes to avoid circular imports
 from routers import dealers_router, product, add_new_dealers
-app.include_router(dealers_router.router)
-app.include_router(product.router)
-app.include_router(add_new_dealers.router)
+app.include_router(dealers_router)
+app.include_router(product)
+app.include_router(add_new_dealers)
+
 
 # Root route
 @app.get("/", response_class=HTMLResponse)
