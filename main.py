@@ -18,7 +18,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Import routers BEFORE routes to avoid circular imports
-from routers.dealers_router import router as dealers_router
+from routers.dealers import router as dealers_router
 from routers.product import router as product_router
 from routers.add_new_dealers import router as add_new_dealers_router
 
