@@ -1,28 +1,34 @@
-from fastapi import FastAPI, Request, Depends, APIRouter
+from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import models
 from database import SessionLocal, engine, get_db
 
+# Initialize app first
+app = FastAPI()
 
-# Create all database tables
+# Database setup
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-router = APIRouter()
-
-# Templates setup
+# Templates and static files
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Import routers BEFORE routes to avoid circular imports
+from routers import dealers_router, product, add_new_dealers
+app.include_router(dealers_router.router)
+app.include_router(product.router)
+app.include_router(add_new_dealers.router)
+
+# Root route
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
+# Direct dealer routes (consider moving to routers/dealers.py)
 @app.get("/dealers", response_class=HTMLResponse)
 def read_dealers(request: Request, page: int = 1, db: Session = Depends(get_db)):
     per_page = 10
@@ -40,30 +46,24 @@ def read_dealers(request: Request, page: int = 1, db: Session = Depends(get_db))
         "total_pages": total_pages
     })
 
-
+# Search route
 @app.get("/search")
 def list_dealers(request: Request, q: str = "", page: int = 1, db: Session = Depends(get_db)):
-    page_size = 10  # or whatever you want
+    page_size = 10
     query = db.query(models.Dealer)
 
     if q:
         q_like = f"%{q}%"
         query = query.filter(
-        (models.Dealer.NAME_OF_THE_FIRM.ilike(q_like)) |
-        (models.Dealer.CONTACT_NO.ilike(q_like)) |
-        (models.Dealer.State.ilike(q_like)) |
-        (models.Dealer.NAME_OF_THE_PROPRIETOR.ilike(q_like))
+            (models.Dealer.NAME_OF_THE_FIRM.ilike(q_like)) |
+            (models.Dealer.CONTACT_NO.ilike(q_like)) |
+            (models.Dealer.State.ilike(q_like)) |
+            (models.Dealer.NAME_OF_THE_PROPRIETOR.ilike(q_like))
         )
 
     total = query.count()
     dealers = query.offset((page - 1) * page_size).limit(page_size).all()
     total_pages = (total + page_size - 1) // page_size
-
-    print(f"Search query: {q}")
-    print(f"Filter: NAME_OF_THE_FIRM ilike % {q} % OR CONTACT_NO ilike % {q} % OR State ilike % {q} %")
-    print(f"Total dealers matching: {total}")
-    print(f"Dealers fetched: {dealers}")
-
 
     return templates.TemplateResponse("dealers.html", {
         "request": request,
@@ -72,23 +72,6 @@ def list_dealers(request: Request, q: str = "", page: int = 1, db: Session = Dep
         "page": page,
         "total_pages": total_pages,
     })
-
-
-from routers import dealers_router
-
-app.include_router(dealers_router)
-
-
-
-
-from routers.add_new_dealers import router as add_new_dealers_router
-
-app.include_router(add_new_dealers_router)
-
-
-
-from routers.product import router as products_router 
-app.include_router(products_router) 
 
 
 
