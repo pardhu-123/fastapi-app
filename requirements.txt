@@ -7,6 +7,6 @@ aiofiles
 psycopg[binary]
 mysql-connector-python
 python-dotenv
-
+python-multipart
 
 
