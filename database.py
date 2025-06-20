@@ -39,3 +39,7 @@ def get_db():
 for db in get_db():
     print("✅ Connected to Railway DB!")
 
+
+print("DB_HOST:", DB_HOST)
+print("DB_USER:", DB_USER)
+print("Final URL:", URL_DATABASE)
